@@ -54,8 +54,15 @@ tests/tls/*
 .prerequisites
 *.dSYM
 Makefile.dep
-.vscode/*
 .idea/*
 .ccls
 .ccls-cache/*
 compile_commands.json
+
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CMakeFiles/
+MyUnix
+build
+build/
