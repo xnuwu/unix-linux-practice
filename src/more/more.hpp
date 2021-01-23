@@ -1,7 +1,7 @@
 #ifndef MORE
 
-#define PAGELEN 8
-#define LINELEN 20
+#define PAGELEN 16
+#define LINELEN 25
 
 #include <iostream>
 
