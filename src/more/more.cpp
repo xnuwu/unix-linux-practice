@@ -5,6 +5,8 @@
 #include <string>
 #include <cstring>
 #include <istream>
+#include <termios.h>
+#include <unistd.h>
 
 void displayContent(std::istream& is) 
 {
@@ -42,9 +44,28 @@ void displayContent(std::istream& is)
 
 int displayMore() 
 {
+    //终端无回现并直接读取输入无需回车
+    static struct termios oldT, newT;
+    tcgetattr(STDIN_FILENO, &oldT);
+    newT = oldT;
+    newT.c_lflag &= ~(ICANON);
+    newT.c_lflag &= ~(ECHO);
+    newT.c_cc[VMIN] = 1;
+    newT.c_cc[VTIME] = 0;
+    tcsetattr(STDIN_FILENO, TCSANOW, &newT);
+
     char reply;
-    std::cout << "\n\033[7m more? \033[m";
+    std::cout << "\033[s";
+    std::cout << "\n\033[7m more? \033[0m";
+
     while(std::cin.get(reply)) {
+
+        std::cout << "\033[7D";
+        std::cout << "\033[K";
+        std::cout << "\033[u";
+        
+        tcsetattr(STDIN_FILENO, TCSANOW, &oldT);
+
         if('q' == reply) {
             return 0;
         }

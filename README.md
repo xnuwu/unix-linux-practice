@@ -6,4 +6,4 @@ unix command program implement
 * [more](src/more)
 * [who](src/who)
 * [cp](src/cp)
-* [logoutTTY](src/logoutTTY)
+* [logoutTTY](src/tty)

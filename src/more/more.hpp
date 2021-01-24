@@ -1,7 +1,9 @@
 #ifndef MORE
 
 #define PAGELEN 16
-#define LINELEN 25
+#define LINELEN 1024
+#define ESC \x1b
+#define CSI ESC[
 
 #include <iostream>
 

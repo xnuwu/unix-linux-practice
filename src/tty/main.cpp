@@ -1,6 +1,6 @@
 // #define DEBUG_LOG
 
-// #include "logoutTTY/logoutTTY.cpp"
+// #include "tty/logoutTTY.cpp"
 // #include <cstdio>
 // #include <cstdlib>
 
