@@ -1,22 +1,13 @@
-#include "who/who.cpp"
-#include <cstdio>
-#include <cstdlib>
+#include "cp/cp.cpp"
 
 int main(int argc, char* argv[])
 {
-    utmp currentRecord;
-    int utmpfd;
-    int recordLen = sizeof(currentRecord);
-
-    if((utmpfd = open(UTMP_FILE, O_RDONLY)) == -1) {
-        std::perror(UTMP_FILE);
-        std::exit(1);
+    if(argc != 3) {
+        std::cout << "usage: " << argv[0] << " src dst" << std::endl;
+        exit(1);
     }
 
-    while(read(utmpfd, &currentRecord, recordLen) == recordLen) {
-        showInfo(currentRecord);
-    }
-
-    close(utmpfd);
+    cp(argv[1], argv[2]);
+    
     return 0;
 }
