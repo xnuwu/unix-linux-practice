@@ -1,13 +1,22 @@
-#include "cp/cp.cpp"
+#define DEBUG_LOG
+
+#include "who/who.cpp"
+#include <cstdio>
+#include <cstdlib>
 
 int main(int argc, char* argv[])
 {
-    if(argc != 3) {
-        std::cout << "usage: " << argv[0] << " src dst" << std::endl;
-        exit(1);
+    struct utmp* record;
+    
+    if(utmpOpen(UTMP_FILENAME) == -1) {
+        std::perror(UTMP_FILENAME);
+        std::exit(-1);
     }
 
-    cp(argv[1], argv[2]);
-    
+    while((record = utmpNext()) != NULLUT) {
+        showInfo(record);
+    }
+
+    utmpClose();
     return 0;
 }
