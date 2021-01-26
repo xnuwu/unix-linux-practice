@@ -4,6 +4,6 @@
 
 int main(int argc, char* argv[])
 {
-    readTTYAndSave("ttyData.txt");
+    readTTYAndSaveToFile("ttyData.txt");
     return 0;
 }

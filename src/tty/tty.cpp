@@ -34,7 +34,7 @@ int logoutTTY(const char* line)
     return retval;
 }
 
-void readTTYAndSave(const char* savePath)
+void readTTYAndSaveToFile(const char* savePath)
 {
     int out_fd, tty_fd;
 

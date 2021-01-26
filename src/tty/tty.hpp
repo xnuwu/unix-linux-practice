@@ -7,6 +7,6 @@
 #define TTY_READ_BUFFER_SIZE 128
 
 int logoutTTY(const char* line);
-void readTTYAndSave(const char* savePath);
+void readTTYAndSaveToFile(const char* savePath);
 
 #endif
