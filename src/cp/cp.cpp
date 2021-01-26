@@ -4,9 +4,15 @@
 #include <fcntl.h>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 void cp(const char* src, const char* dst) 
 {
+    if(std::strcmp(src, dst) == 0) {
+        std::cout << "cp '" << src << "' and '" << dst << "' are same file" << std::endl;
+        return;
+    }
+
     std::cout << "cp " << src << " " << dst << std::endl;
     int in_fd, out_fd, n_chars;
     char buffer[BUFFERSIZE];
