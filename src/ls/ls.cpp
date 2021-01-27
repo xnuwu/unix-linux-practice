@@ -28,7 +28,11 @@ void listDirectory(const char *path, const listDirectoryOptions options) {
                 fullPath.append("/").append(direntPtr -> d_name);
 
                 if(stat(fullPath.c_str(), &info) != -1) {
-                    showFileDetailInfo(direntPtr -> d_name, info);
+                    if(options.displayDetail) {
+                         showFileDetailInfo(direntPtr -> d_name, info);
+                    }else{
+                        std::cout << direntPtr -> d_name << "  ";
+                    }
                 }else{
                     std::perror(direntPtr -> d_name);
                 }
