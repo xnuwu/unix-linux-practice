@@ -6,7 +6,7 @@
         "type": "cppdbg",
         "request": "launch",
         "program": "${fileDirname}/${fileBasenameNoExtension}",
-        "args": ["README.md", "222"],
+        "args": ["-h", "-l", "-s", " /home"],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
         "environment": [],
