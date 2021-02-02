@@ -15,19 +15,15 @@ int main(int argc, char* argv[]) {
         std::cerr << "usage: write0 ttyname" << std::endl;
     }
 
-    std::cout << "open " << argv[1] << std::endl;
-    fd = open(argv[1], O_WRONLY);
+    fd = open(argv[1], O_RDONLY);
     if(fd == -1) {
         std::perror(argv[1]);
         std::exit(1);
     }
 
-    long int w_chars;
-    while(std::cin.getline(buf, BUFF_SIZE)) {
-        w_chars = write(fd, buf, std::strlen(buf));
-        write(fd, "\n", 1);
-        if(w_chars == -1) {
-            std::perror(argv[1]);
+    
+    while(std::cin.get(buf, BUFF_SIZE)) {
+        if(write(fd, buf, std::strlen(buf)) == -1) {
             break;
         }
     }

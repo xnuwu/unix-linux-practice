@@ -6,7 +6,7 @@
         "type": "cppdbg",
         "request": "launch",
         "program": "${fileDirname}/${fileBasenameNoExtension}",
-        "args": ["."],
+        "args": ["/dev/tty1"],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
         "environment": [],
