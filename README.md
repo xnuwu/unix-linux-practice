@@ -9,3 +9,4 @@ unix command program implement
 * [tty](src/tty)
 * [ls](src/ls)
 * [pwd](src/pwd)
+* [tty write](src/write)
