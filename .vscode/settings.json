@@ -25,5 +25,6 @@
         "cstring": "cpp",
         "ctime": "cpp",
         "iomanip": "cpp"
-    }
+    },
+    "cmake.configureSettings": { "gtest_build_samples": "ON" }
 }
