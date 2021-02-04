@@ -7,6 +7,7 @@ unix command program implement
 * [who](src/who)
 * [cp](src/cp)
 * [tty](src/tty)
+    - `tcgetattr``tcsetattr``termios`
 * [ls](src/ls)
 * [pwd](src/pwd)
 * [tty write](src/write)
