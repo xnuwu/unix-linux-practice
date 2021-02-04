@@ -12,5 +12,9 @@ int logoutTTY(const char* line);
 void readTTYAndSaveToFile(const char* savePath);
 bool echoState();
 bool setEchoState(bool state);
+void showTTYInfo();
+void showBaud(speed_t baudSpeed);
+void showTTYFlagInfo(struct termios* ttyInfoPtr);
+void showFlagSet(int flagValue, struct flagInfo theBitName[]);
 
 #endif
