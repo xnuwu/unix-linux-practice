@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <iostream>
 
 int logoutTTY(const char* line)
 {
@@ -64,4 +65,37 @@ void readTTYAndSaveToFile(const char* savePath)
 
     close(tty_fd);
     close(out_fd);
+}
+
+bool echoState() {
+    struct termios info;
+    int rv;
+
+    //0代表stdin
+    rv = tcgetattr(0, &info);
+    if(rv == -1) {
+        std::perror("tcgetattr");
+        std::exit(-1);
+    }
+
+    return info.c_lflag & ECHO;
+}
+
+bool setEchoState(bool state) {
+    struct termios info;
+    int rv;
+    
+    //0代表stdin
+    if(tcgetattr(0, &info) == -1) {
+        std::perror("tcgetattr");
+        std::exit(-1);
+    }
+
+    if(state) {
+        info.c_lflag |= ECHO;
+    } else {
+        info.c_lflag &= ~ECHO;
+    }
+
+    return info.c_lflag & ECHO;
 }
