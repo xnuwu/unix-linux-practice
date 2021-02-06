@@ -1,17 +1,37 @@
 #include <iostream>
-#include "tty/playAgain.cpp"
 #include <signal.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <time.h>
+#include <string.h>
+
+/**
+ * 处理signal信号
+ **/
+void signalHandler(int signal) {
+    std::cout << "signalHandler get signlal " << signal << std::endl;
+}
 
 int main(int argc, char* argv[]) {
 
-    int response;
-    ttyMode(1);
-    set_cr_noecho_mode();
-    set_no_delay_mode();
+    /**
+     * kill -9
+     **/
+    signal(SIGKILL, signalHandler); 
+    
+    /**
+     * ctrl + z
+     **/
+    signal(SIGSTOP, signalHandler);
 
-    signal(SIGINT, ctrlCHandler);
-    signal(SIGQUIT, SIG_IGN);
-    response = getResponse();
-    ttyMode(0);
-    std::cout << "response:" << response << std::endl;
+    
+    int fd = open("/home/course/unix/output.data", O_RDWR | O_TRUNC | O_CREAT);
+    if(fd == -1) {
+        std::perror("/home/course/unix/output.data");
+        exit(1);
+    }
+    while(true) {
+        sleep(1);
+        write(fd, "abc\n", 4);
+    }
 }

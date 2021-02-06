@@ -87,6 +87,7 @@ int getOKChar() {
  * 中断信号处理
  **/
 void ctrlCHandler(int sig) {
+    std::cout << "handle signal " << sig << std::endl;
     ttyMode(0);
     std::exit(0);
 }
