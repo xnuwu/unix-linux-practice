@@ -38,7 +38,10 @@
         "sstream": "cpp",
         "stdexcept": "cpp",
         "tuple": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "thread": "cpp",
+        "chrono": "cpp",
+        "ratio": "cpp"
     },
     "cmake.configureSettings": { "gtest_build_samples": "ON" }
 }

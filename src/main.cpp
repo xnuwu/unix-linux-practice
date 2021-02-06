@@ -1,9 +1,12 @@
 #include <iostream>
-#include <gtest/gtest.h>
-
-#define BUFF_SIZE 512
+#include "tty/playAgain.cpp"
 
 int main(int argc, char* argv[]) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    int response;
+    ttyMode(1);
+    set_cr_noecho_mode();
+    set_no_delay_mode();
+    response = getResponse();
+    ttyMode(0);
+    std::cout << "response:" << response << std::endl;
 }
