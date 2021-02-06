@@ -13,13 +13,16 @@
 void ttyMode(int flag) {
     static termios originalTermiosInfo;
     static int originalFlag;
+    static int stored;
 
     if(flag == 1) {
         tcgetattr(0, &originalTermiosInfo);
         originalFlag = fcntl(0, F_GETFL);
-    }else{
+        stored = 1;
+    }else if(stored == 1) {
         tcsetattr(0, TCSANOW, &originalTermiosInfo);
         fcntl(0, F_SETFL, originalFlag);
+        stored = 0;
     }
 }
 
@@ -78,4 +81,12 @@ int getOKChar() {
     int ch;
     while((ch = getchar()) != EOF && std::strchr("YyNn", ch) == NULL);
     return ch;
+}
+
+/**
+ * 中断信号处理
+ **/
+void ctrlCHandler(int sig) {
+    ttyMode(0);
+    std::exit(0);
 }

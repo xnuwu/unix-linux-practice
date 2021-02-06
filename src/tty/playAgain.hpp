@@ -33,4 +33,9 @@ int getResponse();
  **/
 int getOKChar();
 
+/**
+ * 中断信号处理
+ **/
+void ctrlCHandler(int sig);
+
 #endif
