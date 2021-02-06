@@ -1,6 +1,5 @@
 #include <iostream>
-#include "test/caculatorTest.cpp"
-#include "tty/ttyTest.cpp"
+#include <gtest/gtest.h>
 
 #define BUFF_SIZE 512
 

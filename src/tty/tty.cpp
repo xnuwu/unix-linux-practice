@@ -7,6 +7,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <iostream>
+#include <sys/ioctl.h>
 
 int logoutTTY(const char* line)
 {
@@ -159,5 +160,14 @@ void showFlagSet(int flagValue, struct flagInfo theBitName[])
 {
     for(int i = 0; theBitName[i].fl_value; i++) {
         std::cout << theBitName[i].fl_name << " is " << ((theBitName[i].fl_value & flagValue) ? "ON" : "OFF") << std::endl;
+    }
+}
+
+void printScreenDimensions() {
+    struct winsize wbuff;
+
+    if(ioctl(0, TIOCGWINSZ, &wbuff) != -1) {
+        std::cout << wbuff.ws_row << " rows " << wbuff.ws_col << " cols" << std::endl;
+        std::cout << wbuff.ws_xpixel << " xpixel " << wbuff.ws_ypixel << " ypixel" << std::endl;
     }
 }

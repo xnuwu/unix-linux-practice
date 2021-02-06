@@ -16,5 +16,6 @@ void showTTYInfo();
 void showBaud(speed_t baudSpeed);
 void showTTYFlagInfo(struct termios* ttyInfoPtr);
 void showFlagSet(int flagValue, struct flagInfo theBitName[]);
+void printScreenDimensions();
 
 #endif
