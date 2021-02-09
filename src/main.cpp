@@ -4,7 +4,8 @@
 #include <signal.h>
 #include "game/game.cpp"
 #include "game/ticker_demo.cpp"
+#include "game/bounceld.cpp"
 
 int main(int argc, char* argv[]) {
-    wordPlayAround("Xunwu & Lily");
+    bounce("Xunwu & Lily");
 }
