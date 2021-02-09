@@ -22,7 +22,7 @@ void wordPlayAround(const std::string& word) {
         addstr(word.c_str());
         move(LINES - 1, COLS - 1);
         refresh();
-        usleep(50000);
+        usleep(100000);
         move(ROW, pos);
         addstr(blankString.c_str());
         pos += dir;

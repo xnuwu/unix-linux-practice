@@ -4,7 +4,7 @@
 #include <string>
 
 #define LEFT_EDGE 10
-#define RIGHT_EDGE (COLS - 10)
+#define RIGHT_EDGE (COLS - 20)
 #define ROW (LINES / 2)
 
 /**
