@@ -2,10 +2,8 @@
 #include <curses.h>
 #include <unistd.h>
 #include <signal.h>
-#include "game/game.cpp"
-#include "game/ticker_demo.cpp"
-#include "game/bounceld.cpp"
+#include "game/bounce2d.cpp"
 
 int main(int argc, char* argv[]) {
-    bounce("Xunwu & Lily");
+    playBounce2D();
 }

@@ -41,7 +41,8 @@
         "utility": "cpp",
         "thread": "cpp",
         "chrono": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "string": "cpp"
     },
     "cmake.configureSettings": { "gtest_build_samples": "ON" }
 }
