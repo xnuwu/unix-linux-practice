@@ -12,8 +12,4 @@ unix command program implement
 * [pwd](src/pwd)
 * [tty write](src/write)
 * [bounce2d game](src/game)
-<br/>
-<br/>
-![bounce2d game](img/bounce2d.gif)
-<br/>
-<br/>
+![bounce2d](img/bounce2d.png)

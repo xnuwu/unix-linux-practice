@@ -36,7 +36,8 @@ void setUp() {
     clear();
     noecho();
     crmode();
-    
+    curs_set(0);
+
     signal(SIGINT, SIG_IGN);
     mvaddch(Y_INIT, X_INIT, DEL_SYMBOL);
     move(theSlide.y_pos, theSlide.x_pos);
@@ -111,8 +112,8 @@ void ballAndSlideMove(int signum) {
             isFailed = 1;
         }
     }
-
-    move(LINES - 1, COLS - 1);
+    
+    move(-1, -1);
     refresh();
     signal(SIGALRM, ballAndSlideMove);
 }
