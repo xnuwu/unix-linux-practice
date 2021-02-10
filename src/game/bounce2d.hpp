@@ -3,8 +3,8 @@
 
 #include <string>
 
-#define LINES 30
-#define COLS 100
+#define LINES 40
+#define COLS 120
 
 #define BLANK ' '
 #define DEL_SYMBOL 'o'
