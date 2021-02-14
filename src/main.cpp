@@ -1,9 +1,9 @@
 #include <iostream>
 #include <curses.h>
 #include <unistd.h>
-#include <signal.h>
-#include "game/bounce2d.cpp"
+#include <stdlib.h>
+#include "shell/smsh.cpp"
 
 int main(int argc, char* argv[]) {
-    playBounce2D();
+    runShell();
 }
