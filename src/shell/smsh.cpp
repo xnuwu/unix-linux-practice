@@ -37,6 +37,11 @@ void setUp() {
  * 从用户输入读取命令
  **/
 char* readCommand(const char* prompt, FILE* fp) {
+
+#ifdef DEBUG
+    std::cout << "readCommand() start" << std::endl;
+#endif 
+
     std::cout << prompt;
     size_t bulkSize = 32;
     char* buffer = NULL;
@@ -66,6 +71,11 @@ char* readCommand(const char* prompt, FILE* fp) {
     }
 
     buffer[len] = '\0';
+
+#ifdef DEBUG
+    std::cout << "readCommand() end " << std::endl;
+#endif 
+
     return buffer;
 }
 
@@ -73,7 +83,16 @@ char* readCommand(const char* prompt, FILE* fp) {
  * 按照空格分隔命令
  **/
 char** splitLine(char* line) {
-   
+    
+#ifdef DEBUG
+    std::cout << "splitLine(" << line << ") start" << std::endl;
+#endif 
+
+    if(line == NULL) {
+        std::cout << "line is NULL" << std::endl;
+        return NULL;
+    }
+
     char** list = (char**) emalloc(BUFFER_SIZE);
     size_t bufferSize = BUFFER_SIZE / sizeof(char*);
     size_t bufferSpace = BUFFER_SIZE;
@@ -92,7 +111,7 @@ char** splitLine(char* line) {
         }
 
         if(argnum + 1 >= bufferSize) {
-            list = (char**) erealloc(line, bufferSpace + BUFFER_SIZE);
+            list = (char**) erealloc(list, bufferSpace + BUFFER_SIZE);
             bufferSpace += BUFFER_SIZE;
             bufferSize += BUFFER_SIZE / sizeof(char*);
         }
@@ -106,6 +125,11 @@ char** splitLine(char* line) {
     }
 
     list[argnum] = NULL;
+
+#ifdef DEBUG
+    std::cout << "splitLine() end" << std::endl;
+#endif 
+
     return list;
 }
 
@@ -113,14 +137,24 @@ char** splitLine(char* line) {
  * 重新复制分配字符串
  **/
 char* newstr(char* cp, size_t len) {
+
+#ifdef DEBUG
+    std::cout << "newstr " << cp << " " << len << " start " << std::endl;
+#endif
+
     char* str = (char*) emalloc(len + 1);
     str[len] = '\0';
     strncpy(str, cp, len);
+
+#ifdef DEBUG
+    std::cout << "newstr " << cp << " " << len << " end " << str << std::endl;
+#endif 
+
     return str;
 }
 
 /**
- * 事放字符串数字
+ * 释放字符串数字
  **/
 char* freeList(char** list) {
     char** cp = list;
@@ -149,14 +183,18 @@ void* erealloc(void* p, size_t n) {
     if((rv = realloc(p, n)) == NULL) {
         fatal("realloc failed", "", 1);
     }
-
     return rv;
 }
 
 /**
  * execvp执行cmd命令
  **/
-int execute(char** cmd) {
+int execute(char* cmd[]) {
+
+#ifdef DEBUG
+    std::cout << "execute() start" << std::endl;
+#endif 
+
     int pid;
     int childInfo = -1;
     
@@ -171,6 +209,11 @@ int execute(char** cmd) {
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
         execvp(cmd[0], cmd);
+
+#ifdef DEBUG
+    std::cout << "child execute() end" << std::endl;
+#endif 
+
         perror("cannot execvp command");
         exit(1);
     }else {
@@ -178,6 +221,10 @@ int execute(char** cmd) {
         if(wait(&childInfo) == -1) {
             perror("wait");
         }
+
+#ifdef DEBUG
+    std::cout << "parent execute() end" << std::endl;
+#endif 
         return childInfo;
     }
 }

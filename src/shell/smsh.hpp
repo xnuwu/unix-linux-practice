@@ -15,7 +15,7 @@ char* newstr(char* cp, size_t len);
 char* freeList(char** list);
 void* emalloc(size_t n);
 void* erealloc(void* p, size_t n);
-int execute(char** cmd);
+int execute(char* cmd[]);
 void fatal(const char* label,const char* detail, int rv);
 
 #endif
