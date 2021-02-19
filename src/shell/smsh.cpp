@@ -18,7 +18,7 @@ void runShell() {
 
     while((cmd = readCommand(prompt, stdin)) != NULL) {
         if((cmdList = splitLine(cmd)) != NULL) {
-            ret = execute(cmdList);
+            ret = process(cmdList);
             freeList(cmdList);
         }
         free(cmd);
@@ -234,4 +234,108 @@ int execute(char* cmd[]) {
  **/
 void fatal(const char* label,const char* detail, int rv) {
     std::cerr << "Error: " << label << ", " << detail << std::endl;
+}
+
+/**
+ * 根据上下文条件处理当前行
+ **/
+int process(char* cmd[]) {
+    
+    if(cmd[0] == NULL) {
+        return 0;
+    }
+
+    int rv = 0;
+
+    if(isControlFlow(cmd[0])) {
+        rv = doControlFlow(cmd);
+    }else if(okToExecute()) {
+        rv = execute(cmd);
+    }
+
+    return rv;
+}
+
+/**
+ * 判断当前行是否条件控制流代码
+ **/
+int isControlFlow(char* line) {
+    return  strcmp("if", line) == 0 ||
+            strcmp("then", line) == 0 ||
+            strcmp("else", line) == 0 ||
+            strcmp("fi", line) == 0;
+}
+
+/**
+ * 执行控制流程主语句
+ **/
+int doControlFlow(char* cmd[]) {
+    int rv = -1;
+    if(strcmp("if", cmd[0]) == 0) {
+        if(if_state != NEUTRAL) {
+            rv = sysErr("'if' in wrong position");
+        }else{
+            last_stat = execute(cmd + 1);
+            if_results = (last_stat == 0 ? SUCCESS : FAILED);
+            if_state = WANT_THEN;
+            rv = 0;
+        }
+    }else if(strcmp("then", cmd[0]) == 0) {
+        if(if_state != WANT_THEN) {
+            rv = sysErr("'then' in wrong positioin");
+        }else{
+            if_state = THEN_BLOCK;
+            rv = 0;
+        }
+    }else if(strcmp("else", cmd[0]) == 0) {
+        if(if_state != THEN_BLOCK) {
+            rv = sysErr("'else' in wrong positioin");
+        }else{
+            if_state = ELSE_BLOCK;
+            rv = 0;
+        }
+    }else if(strcmp("fi", cmd[0]) == 0) {
+        if(if_state != ELSE_BLOCK) {
+            rv = sysErr("'fi' in wrong positioin");
+        }else{
+            if_state = NEUTRAL;
+            rv = 0;
+        }
+    }else{
+        fatal("synatx error", cmd[0], 2);
+    }
+
+    return rv;
+}
+
+/**
+ * 是否可以执行当前行代码
+ **/
+int okToExecute() {
+    int rv = 0;
+
+    if(if_state == NEUTRAL) {
+        rv = 1;
+    } else if(if_state == THEN_BLOCK) {
+        if(if_results == SUCCESS) {
+            rv = 1;
+        }
+    } else if(if_state == ELSE_BLOCK) {
+        if(if_results == FAILED) {
+            rv = 1;
+        }
+    } else {
+        sysErr("then expected, please retry!");
+    }
+
+    return rv;
+}
+
+/**
+ * 打印错误信息并返回
+ **/
+int sysErr(char* msg) {
+    if_state = NEUTRAL;
+    std::cerr << "sysErr: " << msg << std::endl;
+    return -1;
 }
