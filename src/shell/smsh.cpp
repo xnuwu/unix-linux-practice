@@ -334,7 +334,7 @@ int okToExecute() {
 /**
  * 打印错误信息并返回
  **/
-int sysErr(char* msg) {
+int sysErr(const char* msg) {
     if_state = NEUTRAL;
     std::cerr << "sysErr: " << msg << std::endl;
     return -1;
