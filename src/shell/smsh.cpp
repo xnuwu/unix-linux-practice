@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "unistd.h"
 #include "sys/wait.h"
 #include "signal.h"
@@ -29,6 +30,7 @@ void runShell() {
  * 设置环境
  **/
 void setUp() {
+    VEnviron2Table(environ);
     signal(SIGINT, SIG_IGN);
     signal(SIGQUIT, SIG_IGN);
 }
@@ -206,10 +208,11 @@ int execute(char* cmd[]) {
         perror("fork");
     }else if(pid == 0) {
         //子进程
+        environ = VTable2environ();
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
         execvp(cmd[0], cmd);
-
+        
 #ifdef DEBUG
     std::cout << "child execute() end" << std::endl;
 #endif 
@@ -250,7 +253,9 @@ int process(char* cmd[]) {
     if(isControlFlow(cmd[0])) {
         rv = doControlFlow(cmd);
     }else if(okToExecute()) {
-        rv = execute(cmd);
+        if(!builtInCommand(cmd, &rv)) {
+            rv = execute(cmd);
+        }
     }
 
     return rv;
@@ -338,4 +343,220 @@ int sysErr(const char* msg) {
     if_state = NEUTRAL;
     std::cerr << "sysErr: " << msg << std::endl;
     return -1;
+}
+
+/**
+ * 说明:判断是否包含builtIn命令参数,如果包含直接执行,并将执行结果赋值给resultPtr所指向的对象
+ * 返回值: 1-builtIn命令,0-非builtIn命令
+ **/
+int builtInCommand(char* cmd[], int* resultPtr) {
+    int rv = 0;
+    
+    if(strcmp(cmd[0], "set") == 0) {
+        rv = 1;
+        VList();
+        *resultPtr = 0;
+    } else if(strchr(cmd[0], '=') != NULL) {
+        *resultPtr = assign(cmd[0]);
+        if(*resultPtr != -1) {
+            rv = 1;
+        }
+    } else if(strcmp(cmd[0], "export") == 0) {
+        if(cmd[1] != NULL && okName(cmd[1]) == 0) {
+            *resultPtr = VExport(cmd[1]);
+        }else{
+            *resultPtr = 1;
+        }
+        rv = 1;
+    }
+
+    return rv;
+}
+
+/**
+ * 说明:进行环境变量赋值,cmd字符串格式为name=value
+ * 返回值: 执行成功返回0,失败返回-1
+ **/
+int assign(char* cmd) {
+    char* ptr = strchr(cmd, '=');
+    *ptr = '\0';
+    int rv = okName(cmd) == 0 ? VStore(cmd, ptr + 1) : -1;
+    *ptr = '=';
+    return rv;
+}
+
+/**
+ * 说明:判断name是否符合命名规范
+ * 返回值:0-符合规范,1-不符合规范
+ **/
+int okName(char* name) {
+
+    char* ptr = name;
+    int rv = 0;
+    while(*ptr) {
+
+        /**
+         * 命名规则
+         * 1、首字母不可为数字
+         * 2、非首字母必须为字符、数字、下划线
+         **/
+        if((ptr == name && isdigit(*ptr)) || !(isalnum(*ptr) || *ptr == '_')) {
+            rv = 1;
+            break;
+        }
+
+        ptr++;
+    }
+
+    //字符串为空
+    if(name == ptr) {
+        rv = 1;
+    }
+
+    return rv;
+}
+
+/**
+ * 说明:遍历打印变量列表
+ **/
+void VList() {
+    for(int i = 0; i < MAX_VARS && environTab[i].str != NULL; i++) {
+        if(environTab[i].global) {
+            std::cout << "*" << environTab[i].str << std::endl;
+        }else {
+            std::cout << " " << environTab[i].str << std::endl;
+        }
+    }
+}
+
+/**
+ * 说明:保存环境变量,如果已存在,则修改值。如果不存在则添加
+ * 返回值:0-保存成功,1-保存失败
+ **/
+int VStore(const char* name, const char* value) {
+    struct var* itemPtr;
+    char* newEnvStrPtr;
+    if((itemPtr = findItem(name, 1)) != NULL && (newEnvStrPtr = buildEnvStr(name, value)) != NULL) {
+        //如果已存在,释放旧的条目值的内存
+        if(itemPtr -> str != NULL) {
+            free(itemPtr -> str);
+        }
+        itemPtr -> str = newEnvStrPtr;
+    }
+
+    return 0;
+}
+
+/**
+ * 说明:构造环境变量字符串
+ * 返回值:返回环境变量字符串指针
+ **/
+char* buildEnvStr(const char* name, const char* value) {
+    char* rv;
+    rv = (char*) emalloc(strlen(name) + strlen(value) + 2);
+    if(rv == NULL) {
+        return NULL;
+    }
+    sprintf(rv, "%s=%s", name, value);
+    return rv;
+}
+
+/**
+ * 说明:在列表中查找name对应的条目
+ * 返回值:如果找到返回对应的指针。未找到根据firsBlank返回（0-返回NULL,1-返回首个空条目对应的指针)
+ **/
+static struct var* findItem(const char* name, int firstBlank) {
+
+    int i = 0;
+    for(; i < MAX_VARS && environTab[i].str != NULL; i++) {
+        if(strncmp(name, environTab[i].str, strlen(name)) == 0 && environTab[i].str[strlen(name)] == '=') {
+            return &environTab[i];
+        }
+    }
+
+    if(i == MAX_VARS || !firstBlank) {
+        return NULL;
+    }
+    return &environTab[i];
+}
+
+/**
+ * 说明:将变量输出到环境变量中
+ * 返回值:0-成功,1-失败
+ **/
+int VExport(const char* name) {
+    int rv = 0;
+    struct var* itemPtr;
+    if((itemPtr = findItem(name, 0)) != NULL) {
+        itemPtr -> global = 1;
+        rv = 0;
+    }else if(VStore(name, "") != 1){
+        rv = VExport(name);
+    }
+
+    return rv;
+}
+
+/**
+ * 说明:查找name对应的环境变量
+ * 返回值:如果找到返回对应的字符串指针,未找到返回NULL
+ **/
+char* VLookUp(const char* name) {
+    struct var* itemPtr;
+    if((itemPtr = findItem(name, 0)) != NULL) {
+        return itemPtr -> str;
+    }
+    return NULL;
+}
+
+/**
+ * 说明:将当前环境变量保存到变量表中
+ * 返回值:0-成功,1-失败
+ **/
+int VEnviron2Table(char* env[]) {
+    struct var* itemPtr;
+    int i;
+    for(i = 0; i < MAX_VARS && env[i] != NULL; i++) {
+        char* strPtr = (char*) emalloc(strlen(env[i]) + 1);
+        if(strPtr == NULL) {
+            return 1;
+        }
+        environTab[i].str = strcpy(strPtr, environ[i]);
+        environTab[i].global = 1;
+    }
+
+    while(i < MAX_VARS) {
+        environTab[i].str = NULL;
+        environTab[i++].global = 0;
+    }
+    return 1;
+}
+
+/**
+ * 说明:将变量表保存到当前环境变量中
+ * 返回值:返回当前环境变量指针
+ **/
+char** VTable2environ() {
+    int i, j, n = 0;
+    char** envtab;
+
+    for(i = 0; i < MAX_VARS && environTab[i].str != NULL; i++) {
+        if(environTab[i].global) {
+            n++;
+        }
+    }
+
+    envtab = (char**) emalloc(sizeof(char*) * (n + 1));
+    if(envtab == NULL) {
+        return NULL;
+    }
+
+    for(int i = 0, j = 0; i < MAX_VARS && environTab[i].str != NULL; i++) {
+        if(environTab[i].global == 1) {
+            envtab[j++] = environTab[i].str;
+        }
+    }
+    envtab[j] = NULL;
+
+    return envtab;
 }
