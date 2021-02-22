@@ -6,6 +6,7 @@
 #include "sys/wait.h"
 #include "signal.h"
 #include "smsh.hpp"
+#include "fcntl.h"
 
 /**
  * 运行shell
@@ -211,7 +212,37 @@ int execute(char* cmd[]) {
         environ = VTable2environ();
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
-        execvp(cmd[0], cmd);
+
+        char** ioRedirectPtr = checkIORedirect(cmd);
+        if(ioRedirectPtr != NULL) {
+
+            //替换标准输入、输出,然后从命令中去除对应的重定向参数
+            if(**ioRedirectPtr == '>') {
+                close(1);
+                creat(*(ioRedirectPtr + 1), 0644);
+
+                free(*ioRedirectPtr);
+                free(*(ioRedirectPtr + 1));
+                *ioRedirectPtr = NULL;
+                *(ioRedirectPtr + 1) = NULL;
+
+                execvp(cmd[0], cmd);
+            }else if(**ioRedirectPtr == '<') {
+                close(0);
+                open(*(ioRedirectPtr + 1), O_RDONLY);
+
+                free(*ioRedirectPtr);   
+                free(*(ioRedirectPtr + 1));
+                *ioRedirectPtr = NULL;
+                *(ioRedirectPtr + 1) = NULL;
+
+                execvp(cmd[0], cmd);
+            }else {
+                std::cerr << "no found io redirect flag" << std::endl;
+            }
+        }else{
+            execvp(cmd[0], cmd);
+        }
         
 #ifdef DEBUG
     std::cout << "child execute() end" << std::endl;
@@ -560,3 +591,22 @@ char** VTable2environ() {
 
     return envtab;
 }
+
+/**
+ * 说明:检查命令是否包含io重定向,重定向符号前后必须有空格
+ * 返回:如果包含重定向，返回指向io重定向符号的指针，否则返回NULL
+ **/
+char** checkIORedirect(char* cmd[]) {
+    if(cmd[0] == NULL) {
+        return NULL;
+    }
+
+    for(int i = 0; cmd[i] != NULL; i++) {
+        if(strchr(cmd[i], '<') != NULL || strchr(cmd[i], '>') != NULL) {
+            return &cmd[i];
+        }
+    }
+
+    return NULL;
+}
+

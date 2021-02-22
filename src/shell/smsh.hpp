@@ -58,4 +58,7 @@ int assign(char* cmd);
 int okName(char* name);
 char* buildEnvStr(const char* name,const char* value);
 
+//io重定向
+char** checkIORedirect(char* cmd[]);
+
 #endif
