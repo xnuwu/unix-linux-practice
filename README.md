@@ -13,3 +13,5 @@ unix command program implement
 * [tty write](src/write)
 * [bounce2d game](src/game)
 ![bounce2d](img/bounce2d.png)
+* [io redirect](src/shell)
+* [tinybc](src/shell)

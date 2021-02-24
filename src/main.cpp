@@ -2,10 +2,9 @@
 #include <curses.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include "shell/smsh.cpp"
 #include <fcntl.h>
-#include "shell/pipe.cpp"
+#include "shell/tinybc.cpp"
 
 int main(int argc, char* argv[]) {
-    testPipe();
+    tinybc();
 }
