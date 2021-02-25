@@ -12,5 +12,7 @@
 #define OOPS(M, X) {perror(M);exit(X);}
 
 void testPipe();
+void testPipe2();
+void testPopen();
 
 #endif

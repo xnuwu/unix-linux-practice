@@ -109,3 +109,16 @@ void testPipe2() {
         fclose(output);
     }
 }
+
+void testPopen() {
+    FILE* fp;
+    char buf[BUFF_SIZE];
+    int i = 0;
+
+    fp = popen("/home/course/unix/bin/echo", "r");
+
+    while(fgets(buf, BUFF_SIZE, fp) != NULL) {
+        std::cout << i++ << " " << buf;
+    }
+    pclose(fp);
+}
