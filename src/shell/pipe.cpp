@@ -122,3 +122,66 @@ void testPopen() {
     }
     pclose(fp);
 }
+
+#define READ 0
+#define WRITE 1
+
+FILE* MyPopen(const char* cmd, const char* mode) {
+
+    int parent_end;
+    int child_end;
+    int pid;
+    int pfd[2];
+
+    if(*mode == 'r') {
+        parent_end = READ;
+        child_end = WRITE;
+    }else if(*mode == 'w') {
+        parent_end = WRITE;
+        child_end = READ;
+    }else {
+        std::cerr << "wrong mode " << mode << std::endl;
+        return NULL;
+    }
+
+    if(pipe(pfd) == -1) {
+        std::perror("pipe failed");
+        std::exit(1);
+    }
+
+    pid = fork();
+    if(pid == -1) {
+        close(pfd[0]);
+        close(pfd[1]);
+        std::perror("fork failed");
+        std::exit(1);
+    }else if(pid == 0) {
+
+        //子进程负责执行cmd
+        if(close(pfd[parent_end]) == -1) {
+            std::cerr << "close parent_end failed" << std::endl;
+            std::exit(1);
+        }
+
+        if(dup2(pfd[child_end], child_end) == -1) {
+            std::cerr << "child dup2 failed" << std::endl;
+            std::exit(1);
+        }
+
+        if(close(pfd[child_end]) == -1) {
+            std::cerr << "close child_end failed" << std::endl;
+            std::exit(1);
+        }
+
+        execl("/bin/sh", "sh", "-c", cmd, NULL);
+        std::exit(1);
+
+    }else {
+        
+        if(close(pfd[child_end]) == -1) {
+            return NULL;
+        }
+
+        return fdopen(pfd[parent_end], mode);
+    }
+}

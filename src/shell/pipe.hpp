@@ -15,4 +15,6 @@ void testPipe();
 void testPipe2();
 void testPopen();
 
+FILE* MyPopen(const char* cmd, const char* mode);
+
 #endif
