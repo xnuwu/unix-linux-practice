@@ -1,0 +1,68 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+#ide
+.*.swp
+*.xo
+*.log
+dump.rdb
+doc-tools
+release
+misc/*
+src/release.h
+appendonly.aof
+SHORT_TERM_TODO
+release.h
+src/transfer.sh
+src/configs
+src/nodes.conf
+deps/lua/src/lua
+deps/lua/src/luac
+deps/lua/src/liblua.a
+tests/tls/*
+.make-*
+.prerequisites
+*.dSYM
+Makefile.dep
+.idea/*
+.ccls
+.ccls-cache/*
+compile_commands.json
+
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CMakeFiles/
+MyUnix
+build
+build/
