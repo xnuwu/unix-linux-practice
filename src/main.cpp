@@ -1,5 +1,5 @@
-#include "shell/timeclnt.cpp"
+#include "shell/rls.cpp"
 
 int main(int argc, char* argv[]) {
-    timeclnt(argv[1], argv[2]);
+    rlsd();
 }
