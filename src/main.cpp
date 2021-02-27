@@ -1,11 +1,5 @@
-#include <iostream>
-#include <curses.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include "shell/pipe.cpp"
-#include "shell/timeserv.cpp"
+#include "shell/timeclnt.cpp"
 
 int main(int argc, char* argv[]) {
-    timeserv();
+    timeclnt(argv[1], argv[2]);
 }
