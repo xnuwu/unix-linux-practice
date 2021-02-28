@@ -144,10 +144,9 @@ void rlsd() {
         if((pipeFp = popen(command, "r")) == NULL) {
             oops("popen");
         }
-        
-        int ch;
-        while((ch = getc(pipeFp)) != EOF) {
-            if(putc(ch, outputFp) == -1) {
+
+        while(fgets(buf, BUFF_SIZE, pipeFp) != NULL) {
+            if(fputs(buf, outputFp) == -1) {
                 oops("fputs");
             }
         }
