@@ -5,6 +5,8 @@
 #include <netdb.h>
 #include <string.h>
 #include <iostream>
+#include <sys/socket.h>
+#include <sys/types.h>
 
 /**
  * description: build a server listen at specific port, 
@@ -31,6 +33,11 @@ int makeServerSocketQ(int port, int backlog) {
     if(sockFd == -1) {
         oops("socket");
         return -1;
+    }
+
+    int resuse = 1;
+    if(setsockopt(sockFd, SOL_SOCKET, SO_REUSEPORT, &resuse, sizeof(resuse)) == -1) {
+        oops("setsocket");
     }
 
     memset(&saddr, 0, sizeof(saddr));
