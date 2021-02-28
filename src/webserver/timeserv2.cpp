@@ -3,11 +3,15 @@
 #include <time.h>
 #include <string.h>
 #include <wait.h>
+#include <signal.h>
 
 /**
  * description: time server using makeSocket
  **/
 void timeserv2() {
+    
+    signal(SIGCHLD, childWait);
+
     int fd;
     int sockFd = makeServerSocket(PORTNUM);
     if(sockFd == -1) {
@@ -17,10 +21,14 @@ void timeserv2() {
 
     while(true) {
         fd = accept(sockFd, NULL, NULL);
-        if(fd == -1) {
+        if(fd == -1 && SIG_HANDLE_STATUS == HANDLE_OFF) {
             std::cerr << "accept failed" << std::endl;
             break;
+        }else if(fd == -1 && SIG_HANDLE_STATUS == HANDLE_ON) {
+            std::cerr << "sig handing, wait a minutes..." << std::endl;
+            continue;
         }
+
         processRequestWithFork(fd);
         close(fd);
     }
@@ -41,16 +49,20 @@ void processRequest(int sockFd) {
  **/
 void processRequestWithFork(int sockFd) {
     int pid = fork();
-    switch(pid) {
-        case -1:
-            return;
-        
-        case 0:
-            dup2(sockFd, 1);
-            close(sockFd);
-            execl("/usr/bin/date", "date", NULL);
-            oops("execl");
-        default:
-            wait(NULL);
+    if(pid == 0) {
+        dup2(sockFd, 1);
+        close(sockFd);
+        execl("/usr/bin/date", "date", NULL);
+        oops("execl");
     }
+}
+
+/**
+ * description: 子进程wait处理
+ **/
+void childWait(int signal) {
+    SIG_HANDLE_STATUS = HANDLE_ON;
+    std::cout << "child wait" << std::endl;
+    while(waitpid(-1, NULL, WNOHANG));
+    SIG_HANDLE_STATUS = HANDLE_OFF;
 }
