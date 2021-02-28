@@ -1,4 +1,4 @@
-#include "webserver.hpp"
+#include "socketlib.hpp"
 #include <unistd.h>
 #include <cstdio>
 #include <cstdlib>
@@ -59,7 +59,7 @@ int makeServerSocketQ(int port, int backlog) {
  **/
 int connectToServer(const char* host, int port) {
     
-    std::cout << "connecting to " << host << ":" << port << std::endl;
+    // std::cout << "connecting to " << host << ":" << port << std::endl;
     if(host == NULL) {
         std::cerr << "host required" << std::endl;
         return -1;

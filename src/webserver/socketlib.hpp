@@ -1,5 +1,5 @@
-#ifndef WEBSERVER
-#define WEBSERVER
+#ifndef SOCKET_LIB
+#define SOCKET_LIB
 
 #define oops(msg) {std::perror(msg);}
 #define HOST_LEN 256
