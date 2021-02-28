@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <iostream>
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 /**
  * description: get result of `ls path` in specific host
@@ -17,6 +19,8 @@ void rls(const char* host, const char* path) {
         std::cerr << "host and path was required" << std::endl;
         return;
     }
+
+    std::cout << host << " " << path << std::endl;
 
     struct sockaddr_in saddr;
     hostent* hp;
@@ -56,7 +60,7 @@ void rls(const char* host, const char* path) {
 
     //print result
     while((readNum = read(sockId, buf, BUFF_SIZE)) > 0) {
-        if(write(1, buf, readNum) != readNum) {
+        if(write(1, buf, readNum) == -1) {
             oops("write stdout");
         }
     }
@@ -85,6 +89,12 @@ void rlsd() {
         oops("socket");
     }
 
+    //resuse port
+    int enable = 1;
+    if(setsockopt(sockId, SOL_SOCKET, SO_REUSEPORT, &enable, sizeof(int)) == -1) {
+        oops("resuse port");
+    }
+
     //bind address
     memset(&saddr, 0, sizeof(saddr));
     gethostname(host, HOST_LEN);
@@ -105,6 +115,7 @@ void rlsd() {
     socklen_t raddrLen;
     while(true) {
         sockFd = accept(sockId, &raddr, &raddrLen);
+        
         if(sockFd == -1) {
             oops("accept");
         }
@@ -116,12 +127,12 @@ void rlsd() {
             std::cout << "connect from " << ipStr << ":" << ntohs(addrP -> sin_port) << std::endl;
         }
 
-        if((inputFp = fdopen(sockFd, "r")) == NULL) {
-            oops("fdopen sockFd r");
-        }
-
         if((outputFp = fdopen(sockFd, "w")) == NULL) {
             oops("fdopen sockFd w");
+        }
+
+        if((inputFp = fdopen(sockFd, "r")) == NULL) {
+            oops("fdopen sockFd r");
         }
 
         if(fgets(buf, BUFF_SIZE - 5, inputFp) == NULL) {
@@ -133,21 +144,25 @@ void rlsd() {
         if((pipeFp = popen(command, "r")) == NULL) {
             oops("popen");
         }
-
+        
         int ch;
-        while((ch = fgetc(pipeFp)) != EOF) {
-            putc(ch, outputFp);
+        while((ch = getc(pipeFp)) != EOF) {
+            if(putc(ch, outputFp) == -1) {
+                oops("fputs");
+            }
         }
-
-        pclose(pipeFp);
+        fflush(outputFp);
+        
         fclose(inputFp);
         fclose(outputFp);
+        pclose(pipeFp);
     }
 }
 
 void sonitize(char* path) {
-    char* src, *dst;
-    dst = src;
+    char* dst, *src;
+    src = path;
+    dst = path;
 
     while(*src != '\0') {
         if(*src == '/' || isalnum(*src)) {

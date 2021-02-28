@@ -6,7 +6,7 @@
         "type": "cppdbg",
         "request": "launch",
         "program": "${fileDirname}/${fileBasenameNoExtension}",
-        "args": ["127.0.0.1", "6790"],
+        "args": ["127.0.0.1", "/home"],
         "stopAtEntry": false,
         "cwd": "${workspaceFolder}",
         "environment": [],
